@@ -17,4 +17,9 @@ public class NewsRepositoryImpl implements NewsRepository {
     public Optional<News> findById(String id) {
         return newsJpaRepository.findById(id);
     }
+
+    @Override
+    public void save(News news) {
+        newsJpaRepository.save(news);
+    }
 }

@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface NewsRepository {
     Optional<News> findById(String id);
+    void save(News news);
 }
