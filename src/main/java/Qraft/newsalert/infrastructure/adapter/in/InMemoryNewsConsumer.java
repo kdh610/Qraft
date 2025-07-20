@@ -1,6 +1,5 @@
 package Qraft.newsalert.infrastructure.adapter.in;
 
-import Qraft.newsalert.application.port.in.MessageConsumerPort;
 import Qraft.newsalert.domain.entity.News;
 import Qraft.newsalert.domain.repository.NewsRepository;
 import Qraft.newsalert.exception.BaseException;
@@ -18,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class InMemoryConsumerAdapter implements MessageConsumerPort {
+public class InMemoryNewsConsumer {
 
     private final LinkedBlockingQueue<String> inMemoryMessageQueue;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -28,7 +27,6 @@ public class InMemoryConsumerAdapter implements MessageConsumerPort {
     /**
      * 메세지 큐에서 뉴스를 가져와 웹소켓을 통해 브로드캐스트합니다.
      */
-    @Override
     @PostConstruct
     public void receiveMessage() {
         executorService.submit(() -> {
