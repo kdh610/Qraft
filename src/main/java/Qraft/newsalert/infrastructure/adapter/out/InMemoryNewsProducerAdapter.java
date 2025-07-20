@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 @Component
 @RequiredArgsConstructor
-public class InMemoryProducerAdapter implements MessageProducerPort {
+public class InMemoryNewsProducerAdapter implements MessageProducerPort {
 
     private final LinkedBlockingQueue<String> inMemoryMessageQueue;
 
