@@ -4,6 +4,8 @@ import Qraft.newsalert.application.port.out.MessageProducerPort;
 import Qraft.newsalert.domain.entity.News;
 import Qraft.newsalert.domain.repository.NewsRepository;
 import Qraft.newsalert.application.port.in.MessageConsumerPort;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,8 @@ public class NewsServiceImpl implements NewsService {
     private final MessageProducerPort messageProducer;
 
     @Override
-    public News getNewsById(Long id){
-        String newsId = messageConsumer.receiveMessage();
-        return newsRepository.findById(newsId)
-                .orElseThrow(() -> new RuntimeException("News not found with id: " + newsId));
+    public void getNewsById(){
+        messageConsumer.receiveMessage();
     }
 
     @Override
@@ -27,4 +27,6 @@ public class NewsServiceImpl implements NewsService {
         newsRepository.save(news);
         messageProducer.send(news.getId());
     }
+
+
 }
