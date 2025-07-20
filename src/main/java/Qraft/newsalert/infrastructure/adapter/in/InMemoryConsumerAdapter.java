@@ -40,7 +40,9 @@ public class InMemoryConsumerAdapter implements MessageConsumerPort {
 
                     webSocketHandler.broadcastNewsUpdate(news);
                } catch (InterruptedException e) {
-                   throw new RuntimeException(e);
+                   Thread.currentThread().interrupt();
+                   log.info("Consumer thread interrupted, shutting down");
+                   break;
                } catch (BaseException e) {
                    log.error("Error processing message: {}", e.getMessage());
                }

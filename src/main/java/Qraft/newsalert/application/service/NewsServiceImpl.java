@@ -5,6 +5,7 @@ import Qraft.newsalert.domain.entity.News;
 import Qraft.newsalert.domain.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class NewsServiceImpl implements NewsService {
      * @param news
      */
     @Override
+    @Transactional
     public void saveNews(News news) {
         newsRepository.save(news);
         messageProducer.send(news.getId());
