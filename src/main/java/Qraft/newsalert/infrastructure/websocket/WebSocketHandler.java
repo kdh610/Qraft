@@ -1,7 +1,8 @@
 package Qraft.newsalert.infrastructure.websocket;
 
-import Qraft.newsalert.application.service.NewsService;
 import Qraft.newsalert.domain.entity.News;
+import Qraft.newsalert.exception.BaseException;
+import Qraft.newsalert.exception.Code;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -34,22 +34,23 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String token = extractTokenFromUri(session.getUri());
 
+        // 1. 클라이언트가 웹소켓 연결 시 URI에서 토큰을 추출하고 토큰이 존재하는지 검사
+        String token = extractTokenFromUri(session.getUri());
         if (token == null || token.isBlank()) {
             log.warn("토큰 없이 웹소켓 연결 시도, 연결을 종료합니다.");
             session.close(CloseStatus.BAD_DATA.withReason("Token is required"));
             return;
         }
 
-        // 2. 세션 매니저에 등록을 시도합니다.
+        // 2. 세션 매니저에 등록
         boolean success = sessionManager.registerSession(token, session);
 
         if (success) {
             log.info("새로운 웹소켓 연결 성공. Token: {}, Session ID: {}", token, session.getId());
         } else {
-            // 3. 등록 실패 시 (중복 연결), 새로 들어온 연결을 차단(종료)합니다.
-            log.warn("중복된 토큰으로 웹소켓 연결 시도, 연결을 차단합니다. Token: {}", token);
+            // 3. 동일 토큰으로 연결시도시 연결을 차단
+            log.error("중복된 토큰으로 웹소켓 연결 시도, 연결을 차단합니다. Token: {}", token);
             session.close(CloseStatus.POLICY_VIOLATION.withReason("Duplicate connection"));
         }
     }
@@ -58,9 +59,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         return UriComponentsBuilder.fromUri(uri)
                 .build()
                 .getQueryParams()
-                .getFirst("token");  //URI에서 토큰을 추출합니다.
+                .getFirst("token");
     }
 
+    /**
+     * 웹소켓을 통해 세션에 연결된 모든 클라이언트에게 업데이트된 뉴스를 브로드캐스트합니다.
+     * @param news
+     */
     public void broadcastNewsUpdate(News news){
         Map<String, WebSocketSession> sessions = sessionManager.getSessions();
 

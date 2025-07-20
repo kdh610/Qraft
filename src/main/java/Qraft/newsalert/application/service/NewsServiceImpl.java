@@ -3,9 +3,6 @@ package Qraft.newsalert.application.service;
 import Qraft.newsalert.application.port.out.MessageProducerPort;
 import Qraft.newsalert.domain.entity.News;
 import Qraft.newsalert.domain.repository.NewsRepository;
-import Qraft.newsalert.application.port.in.MessageConsumerPort;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +11,12 @@ import org.springframework.stereotype.Service;
 public class NewsServiceImpl implements NewsService {
 
     private final NewsRepository newsRepository;
-    private final MessageConsumerPort messageConsumer;
     private final MessageProducerPort messageProducer;
 
-    @Override
-    public void getNewsById(){
-        messageConsumer.receiveMessage();
-    }
-
+    /**
+     * 번역된 뉴스를 DB에 저장하고, 메세지 큐에 뉴스의 고유ID를 전송합니다.
+     * @param news
+     */
     @Override
     public void saveNews(News news) {
         newsRepository.save(news);

@@ -16,7 +16,7 @@ public class NewsController {
     @PostMapping("/news")
     public String postNews(@RequestBody SaveNewsRequestDto newsRequest) {
         newsService.saveNews(SaveNewsRequestDto.toEntity(newsRequest));
-        return "News posted successfully: ";
+        return "News posted successfully";
     }
 
 }
